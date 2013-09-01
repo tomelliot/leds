@@ -7,3 +7,4 @@ address = 0x09
 led1 = led(busNb, address)
 led1.setrgb(0xFF, 0x00, 0x00)
 led1.playscript(11, 0x00, 0x00)
+led1.getfirmware()

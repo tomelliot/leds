@@ -46,8 +46,8 @@ class led:
 		self.bus.write_byte(self.address, ord('t'))
 		self.bus.write_byte(self.address, t)
 
-	def getrgbcolour(self):
-# ???
+	#def getrgbcolour(self):
+		# ???
 
 #	def writescript(self, n, p, ...)
 #	def readscript(self, n, p	)
@@ -58,14 +58,21 @@ class led:
 
 #	def setaddress(self, a, ...)
 #	def getaddress(self)
-#	def getfirmware(self)
+
+	def getfirmware(self):
+		#self.bus.write_byte(self.address, ord('Z'))
+		fw = bytearray()
+		fw = self.bus.read_block_data(self.address, ord('Z'))
+		print fw
+	#	print chr(self.bus.read_byte(self.address))
+	#	print chr(self.bus.read_byte(self.address))
+		
 	def startupparams(self, m, n, r, f, t):
 		self.bus.write_byte(self.address, ord('B'))
 		sendthreebytes(self.bus, self.address, m, n, r)
 		self.bus.write_byte(self.address, f)
 		self.bus.write_byte(self.address, t)
 		
-
 def sendthreebytes(bus, address, one, two, three):
 	bus.write_byte(address, one)
 	bus.write_byte(address, two)
