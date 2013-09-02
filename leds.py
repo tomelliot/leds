@@ -4,47 +4,39 @@
 
 # todo: check data passed in is only byte-size (check for > 256?)
 
-from smbus import SMBus
 
 class led:
-	def __init__(self, bus, address):
+	def __init__(self, bus = 1, addr = 0x09):
+		from smbus import SMBus
 		self.bus = SMBus(bus)
-		self.address = address
+		self.addr = addr
 
 	def setrgb(self, r, g, b):
-		self.bus.write_byte(self.address, ord('n'))
-		sendthreebytes(self.bus, self.address, r, g, b)
+		sendbytes(self.bus, self.addr, ord('n'), r, g, b)
 	
 	def fadergb(self, r, g, b):
-		self.bus.write_byte(self.address, ord('c'))
-		sendthreebytes(self.bus, self.address, r, g, b)
+		sendbytes(self.bus, self.addr, ord('c'), r, g, b)
 
 	def fadehsb(self, r, g, b):
-		self.bus.write_byte(self.address, ord('h'))
-		sendthreebytes(self.bus, self.address, r, g, b)
+		sendbytes(self.bus, self.addr, ord('h'), r, g, b)
 
 	def faderandomrgb(self, r, g, b):
-		self.bus.write_byte(self.address, ord('C'))
-		sendthreebytes(self.bus, self.address, r, g, b)
+		sendbytes(self.bus, self.addr, ord('C'), r, g, b)
 
 	def faderandomhsb(self, r, g, b):
-		self.bus.write_byte(self.address, ord('H'))
-		sendthreebytes(self.bus, self.address, r, g, b)
+		sendbytes(self.bus, self.addr, ord('H'), r, g, b)
 
 	def playscript(self, n, r, p):
-		self.bus.write_byte(self.address, ord('p'))
-		sendthreebytes(self.bus, self.address, n, r, p)
+		sendbytes(self.bus, self.addr, ord('p'), n, r, p)
 
 	def stopscript(self):
-		self.bus.write_byte(self.address, ord('o'))
+		sendbytes(self.bus, self.addr, ord('o'))
 
 	def setfadespeed(self, f):
-		self.bus.write_byte(self.address, ord('f'))
-		self.bus.write_byte(self.address, f)
+		sendbytes(self.bus, self.addr, ord('f'), f)
 
 	def settimeadjust(self, t):
-		self.bus.write_byte(self.address, ord('t'))
-		self.bus.write_byte(self.address, t)
+		sendbytes(self.bus, self.addr, ord('t'), t)
 
 	#def getrgbcolour(self):
 		# ???
@@ -53,28 +45,24 @@ class led:
 #	def readscript(self, n, p	)
 
 	def scriptlengthrepeats(self, n, l, r):
-		self.bus.write_byte(self.address, ord('L'))
-		sendthreebytes(self.bus, self.address, n, l, r)
+		sendbytes(self.bus, self.addr, ord('L'), n, l, r)
 
-#	def setaddress(self, a, ...)
-#	def getaddress(self)
+#	def setaddr(self, a, ...)
+#	def getaddr(self)
 
 	def getfirmware(self):
-		#self.bus.write_byte(self.address, ord('Z'))
-		fw = bytearray()
-		fw = self.bus.read_block_data(self.address, ord('Z'))
-		print fw
-	#	print chr(self.bus.read_byte(self.address))
-	#	print chr(self.bus.read_byte(self.address))
+		sendbytes(self.bus, self.addr, ord('Z'))
+		print readbytes(self.bus, self.addr, 2)
+	#	print chr(self.bus.read_byte(self.address)) 
+	#	print chr(self.bus.read_byte(self.address)) 
 		
 	def startupparams(self, m, n, r, f, t):
-		self.bus.write_byte(self.address, ord('B'))
-		sendthreebytes(self.bus, self.address, m, n, r)
-		self.bus.write_byte(self.address, f)
-		self.bus.write_byte(self.address, t)
-		
-def sendthreebytes(bus, address, one, two, three):
-	bus.write_byte(address, one)
-	bus.write_byte(address, two)
-	bus.write_byte(address, three)
-
+		sendbytes(self.bus, self.addr, ord('B'), m, n, r, f, t)
+	
+def sendbytes(bus, addr, *bytes):
+	for byte in bytes:
+		bus.write_byte(addr, byte)
+	
+def readbytes(bus, addr, nb_bytes):
+	for i in range(nb_bytes):
+		yield bus.read_byte(addr, byte)
