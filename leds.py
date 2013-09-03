@@ -11,6 +11,10 @@ class led:
 		self.bus = SMBus(bus)
 		self.addr = addr
 
+	def off(self):
+		self.stopscript()
+		self.setrgb(0x00, 0x00, 0x00)
+
 	def setrgb(self, r, g, b):
 		sendbytes(self.bus, self.addr, ord('n'), r, g, b)
 	
@@ -38,23 +42,34 @@ class led:
 	def settimeadjust(self, t):
 		sendbytes(self.bus, self.addr, ord('t'), t)
 
-	#def getrgbcolour(self):
-		# ???
+	def getrgb(self):
+		sendbytes(self.bus, self.addr, ord('g'))
+		r, g, b = readbytes(self.bus, self.addr, 3)
+		return r, g, b
 
-#	def writescript(self, n, p, ...)
-#	def readscript(self, n, p	)
+	def writescript(self, n, p, d, c, a1, a2, a3):
+		sendbytes(self.bus, self.addr, ord('W'), n, p, d, c, a1, a2, a3)
+
+	def readscript(self, n, p):
+		sendbytes(self.bus, self.addr, ord('R'), n, p)
+		d, c, a1, a2, a3 = readbytes(self.bus, self.addr, 5)
+		return d, c, a1, a2, a3
 
 	def scriptlengthrepeats(self, n, l, r):
 		sendbytes(self.bus, self.addr, ord('L'), n, l, r)
 
-#	def setaddr(self, a, ...)
-#	def getaddr(self)
+	def setaddr(self, a):
+		sendbytes(self.bus, self.addr, ord('A'), a, 0xd0, 0x0d, a)
+		
+	def getaddr(self):
+		sendbytes(self.bus, self.addr, ord('a'))
+		a = self.bus.read_byte(self.addr)
+		return a
 
 	def getfirmware(self):
 		sendbytes(self.bus, self.addr, ord('Z'))
-		print readbytes(self.bus, self.addr, 2)
-	#	print chr(self.bus.read_byte(self.address)) 
-	#	print chr(self.bus.read_byte(self.address)) 
+		a, b = readbytes(self.bus, self.addr, 2)
+		return chr(a), chr(b)
 		
 	def startupparams(self, m, n, r, f, t):
 		sendbytes(self.bus, self.addr, ord('B'), m, n, r, f, t)
@@ -65,4 +80,4 @@ def sendbytes(bus, addr, *bytes):
 	
 def readbytes(bus, addr, nb_bytes):
 	for i in range(nb_bytes):
-		yield bus.read_byte(addr, byte)
+		yield bus.read_byte(addr)
